@@ -1,0 +1,14 @@
+{
+  "name": "antigravity-portfolio",
+  "version": "1.0.0",
+  "description": "Antigravity Portfolio - FastAPI backend with auto-start",
+  "scripts": {
+    "start": "cd portfolio_app && py main.py",
+    "dev": "cd portfolio_app && py main.py",
+    "install-deps": "py -m pip install fastapi uvicorn jinja2 python-multipart",
+    "setup": "npm run install-deps && npm run start"
+  },
+  "keywords": ["portfolio", "fastapi", "python"],
+  "author": "Yashwant Shete",
+  "license": "ISC"
+}

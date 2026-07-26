@@ -1,0 +1,1655 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,800;1,400&display=swap');
+
+/* 
+========================================
+   Fonts Definition
+========================================
+*/
+@font-face {
+    font-family: 'Stark';
+    src: url('../fonts/Stark.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* 
+========================================
+   Theme Variables (Mark I Dark System)
+========================================
+*/
+:root {
+    /* Mark I Dark System Variables */
+    --forge-black: #0A0A0B;
+    --cave-iron: #1A1A1E;
+    --raw-steel: #2C2C35;
+    --smelted-grey: #4A4A58;
+    --iron-mist: #7A7A8C;
+    --arc-glow: #5BB8D4;
+    --reactor-core: #A8E6F0;
+    --ember-red: #C0392B;
+    --molten-edge: #E8603C;
+    --stark-white: #E8E8F0;
+
+    /* Theme Tokens Mapped to Legacy Variables */
+    --bg-void: var(--forge-black);
+    --bg-deep-space: var(--cave-iron);
+    --bg-panel: rgba(44, 44, 53, 0.7);
+    /* Raw Steel with Opacity */
+    --gunmetal-panel: rgba(26, 26, 30, 0.8);
+    /* Cave Iron */
+    --text-main: var(--stark-white);
+    --text-muted: var(--iron-mist);
+
+    --arc-cyan: var(--ember-red);
+    --stark-red: var(--molten-edge);
+    --titanium-gold: var(--smelted-grey);
+    --armor-red: var(--ember-red);
+    --accent-muted-gold: var(--molten-edge);
+    --weathered-bone: var(--stark-white);
+    --cursed-coral: var(--molten-edge);
+
+    --glow-arc: 0 0 15px var(--ember-red), 0 0 30px rgba(192, 57, 43, 0.4);
+
+    /* Fonts */
+    --font-heading: 'Stark', 'Rajdhani', 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Share Tech Mono', 'Courier New', monospace;
+    --font-body: 'JetBrains Mono', 'Inter', system-ui, sans-serif;
+}
+
+/* 
+========================================
+   Reset & Base Aesthetics
+========================================
+*/
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    /* Force browser to offset scroll targets, clearing the sticky navbar */
+    scroll-padding-top: 100px;
+}
+
+body {
+    font-family: var(--font-body);
+    color: var(--text-main);
+    background-color: var(--bg-void);
+    overflow-x: hidden;
+    position: relative;
+    /* On Load Transition */
+    opacity: 0;
+    animation: siteFadeIn 1.5s ease-in forwards;
+}
+
+@keyframes siteFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Zero-Day WebGL 3D Background */
+#bg-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -2;
+    pointer-events: none;
+    /* Let clicks pass through to the website */
+}
+
+/* Optional Overlay Array to improve text legibility over the 3D Image */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: radial-gradient(circle at center, transparent 0%, rgba(5, 5, 8, 0.8) 100%);
+    will-change: transform;
+    transform: translateZ(0);
+}
+
+main,
+header,
+section {
+    position: relative;
+    z-index: 1;
+}
+
+a {
+    color: var(--arc-cyan);
+    transition: color 0.3s ease;
+}
+
+/* 
+========================================
+   Global Physics & Keyframes
+========================================
+*/
+/* Gentle ocean swell to mimic subtle breathing/floating */
+@keyframes nautical-sway {
+    0% {
+        transform: rotate(-0.5deg) translateY(-2px);
+    }
+
+    100% {
+        transform: rotate(0.5deg) translateY(2px);
+    }
+}
+
+@keyframes nautical-sway-heavy {
+    0% {
+        transform: rotate(-0.5deg) translateY(-2px) translateX(-50%);
+    }
+
+    100% {
+        transform: rotate(0.5deg) translateY(2px) translateX(-50%);
+    }
+}
+
+@keyframes slide-fade {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+
+
+/* 
+========================================
+   Preloader Styles
+========================================
+*/
+.no-scroll {
+    overflow: hidden;
+}
+
+#theme-preloader {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background-color: var(--bg-deep-space, #0F1014);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#theme-preloader-video {
+    position: absolute;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    z-index: -1;
+    opacity: 0.4;
+    /* Dim video to keep text highly legible */
+}
+
+.theme-core {
+    position: relative;
+    z-index: 2;
+    color: var(--arc-cyan);
+    font-family: var(--font-body);
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    animation: pulse 1.5s infinite alternate;
+}
+
+.bypass-text {
+    position: absolute;
+    z-index: 2;
+    bottom: 2rem;
+    color: var(--text-muted);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    animation: blink 2s infinite;
+}
+
+@keyframes blink {
+
+    0%,
+    100% {
+        opacity: 0.3;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 0.3;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+.preloader-hidden {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+}
+
+/* Zero-Wrap Fade Logic: Affects all children except the preloader itself */
+body.hide-content>*:not(#theme-preloader) {
+    opacity: 0;
+}
+
+body.site-fade-in>*:not(#theme-preloader) {
+    opacity: 1;
+    transition: opacity 1s ease-in;
+}
+
+/* 
+========================================
+   UI Components: Stark HUD Navigation
+========================================
+*/
+header.hud-header {
+    width: 100%;
+}
+
+nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 3rem 5%;
+
+    /* The Glassmorphism Effect */
+    background-color: var(--gunmetal-panel);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+
+    will-change: transform, backdrop-filter;
+}
+
+/* Brand Logo Layout */
+.nav-brand {
+    display: flex;
+    align-items: center;
+}
+
+/* Desktop Links Container */
+.nav-links {
+    display: flex;
+    gap: 3rem;
+    list-style: none;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+}
+
+/* Base Link Styles */
+nav a {
+    text-decoration: none;
+    color: #FFFFFF;
+    /* High contrast stark white default */
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    display: inline-block;
+    padding-bottom: 0.25rem;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Hover Physics (The Targeting System) */
+nav a:hover,
+nav a:focus-visible {
+    color: var(--arc-cyan);
+    text-shadow: 0 0 8px var(--arc-cyan);
+    outline: none;
+}
+
+/* Active State (Visualized via JS later if needed, but here's the CSS base) */
+nav a.active {
+    color: var(--arc-cyan);
+    border-bottom-color: var(--titanium-gold);
+}
+
+/* ========================================
+   Stark Access Button Architecture
+======================================== */
+.stark-access-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: transparent;
+    border: 1px solid var(--titanium-gold);
+    border-radius: 2px;
+    /* Sharp mechanical corners */
+    padding: 0.5rem 1rem;
+    color: var(--arc-cyan);
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+/* The Icon Engine: Converting B&W asset to Glowing Hologram */
+.stark-mask-icon {
+    width: 24px;
+    height: 24px;
+    filter: invert(1) brightness(2) drop-shadow(0 0 4px var(--arc-cyan));
+    transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+/* Hover Physics: Powering up the Arc Reactor */
+.stark-access-btn:hover,
+.stark-access-btn:focus-visible {
+    border-color: var(--arc-cyan);
+    box-shadow: 0 0 10px var(--arc-cyan), inset 0 0 10px rgba(0, 255, 255, 0.2);
+    transform: translateY(-2px);
+    /* Slight lift */
+    color: var(--arc-cyan);
+    text-shadow: 0 0 8px var(--arc-cyan);
+}
+
+.stark-access-btn:hover .stark-mask-icon,
+.stark-access-btn:focus-visible .stark-mask-icon {
+    transform: scale(1.1);
+    filter: invert(1) brightness(2) drop-shadow(0 0 8px var(--arc-cyan));
+}
+
+/* Specific interactive physics for Brand Logo */
+#nav-logo-ys {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--stark-red);
+    letter-spacing: 3px;
+    border-bottom: none;
+    /* Logo never gets the active underline */
+}
+
+#nav-logo-ys:hover,
+#nav-logo-ys:focus-visible {
+    transform: scale(1.05) translateZ(0);
+    color: var(--titanium-gold);
+    text-shadow: 0 0 12px rgba(212, 175, 55, 0.6);
+}
+
+/* Mobile Toggle Button (Hidden on Desktop) */
+.mobile-menu-toggle {
+    display: none;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    flex-direction: column;
+    gap: 6px;
+    padding: 0.5rem;
+    z-index: 101;
+    /* Above the mobile menu */
+}
+
+.hamburger-line {
+    width: 28px;
+    height: 2px;
+    background-color: var(--arc-cyan);
+    transition: all 0.3s ease;
+}
+
+/* 
+========================================
+   Responsive Menu (The HUD Dropdown)
+========================================
+*/
+@media (max-width: 767px) {
+    .mobile-menu-toggle {
+        display: flex;
+    }
+
+    /* Transform standard links into a sliding panel */
+    .nav-links {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        flex-direction: column;
+        background-color: var(--gunmetal-panel);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+        padding: 2rem 0;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    /* The JS 'open' state */
+    .nav-links.nav-open {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    /* Mobile hamburger animation states when open */
+    .mobile-menu-toggle[aria-expanded="true"] .hamburger-line:nth-child(1) {
+        transform: translateY(8px) rotate(45deg);
+        background-color: var(--stark-red);
+    }
+
+    .mobile-menu-toggle[aria-expanded="true"] .hamburger-line:nth-child(2) {
+        opacity: 0;
+    }
+
+    .mobile-menu-toggle[aria-expanded="true"] .hamburger-line:nth-child(3) {
+        transform: translateY(-8px) rotate(-45deg);
+        background-color: var(--stark-red);
+    }
+}
+
+/* 
+========================================
+   Main Structure & Sections
+========================================
+*/
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding-top: 6rem;
+}
+
+section {
+    min-height: 100vh;
+    width: 90%;
+    max-width: 1200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 4rem 1rem;
+}
+
+h2 {
+    font-family: var(--font-heading);
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 4rem;
+    color: var(--accent-muted-gold);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
+}
+
+#about-title {
+    align-self: flex-start;
+    text-align: left;
+    width: 100%;
+}
+
+/* 
+========================================
+   Hero Sequence (Cinematic Choreography)
+========================================
+*/
+#home-section {
+    width: 100%;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-sequence-wrapper {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.hero-fixed-card {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    will-change: left, transform;
+}
+
+.hero-text {
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+}
+
+.hero-text h1,
+.hero-text h2,
+.hero-text h3 {
+    margin: 0;
+    opacity: 0;
+    will-change: transform, opacity;
+    gap: 1rem;
+}
+
+.hero-text h1 {
+    font-family: var(--font-heading, "Cinzel Decorative", serif);
+    font-weight: 900;
+    line-height: 1.1;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    text-shadow: 0 10px 25px rgba(0, 0, 0, 0.9);
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    color: var(--weathered-bone, #E2D9C8);
+}
+
+.hero-text h2 {
+    font-size: clamp(1.5rem, 4vw, 3rem);
+    font-family: var(--font-body);
+    letter-spacing: 0.1em;
+    font-weight: 900;
+    line-height: 1.1;
+    text-transform: uppercase;
+    text-shadow: 0 10px 25px rgba(0, 0, 0, 0.9);
+    color: var(--weathered-bone, #E2D9C8);
+}
+
+.hero-text h3 {
+    font-size: clamp(1rem, 2vw, 2rem);
+    color: var(--cursed-coral, #D95B66);
+    font-family: var(--font-heading, "Cinzel Decorative", serif);
+    font-weight: 900;
+    line-height: 1.1;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    text-shadow: 0 10px 25px rgba(0, 0, 0, 0.9);
+}
+
+.hero-cta {
+    align-self: center;
+    margin-top: 2rem;
+    opacity: 0;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    min-width: 44px;
+    padding: 1rem 2.5rem;
+    border-radius: 8px;
+    background: var(--bg-panel);
+    color: var(--text-main);
+    border: 1px solid var(--ember-red);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1rem;
+    font-family: var(--font-body);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.8);
+    transition: 0.4s ease, border-color 0.4s ease, color 0.4s ease, box-shadow 0.4s ease, transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    will-change: transform, opacity;
+}
+
+.hero-cta:hover,
+.hero-cta:focus-visible {
+    transform: translateY(-4px);
+    border-color: var(--molten-edge);
+    color: var(--arc-cyan);
+    box-shadow: var(--glow-arc);
+    outline: none;
+}
+
+.hero-cta:focus-visible {
+    outline: 2px solid var(--molten-edge);
+    outline-offset: 4px;
+}
+
+
+
+/* 
+========================================
+   The GPU-Accelerated CSS Timeline
+========================================
+*/
+/* Phase 1: Fade In Right-to-Left */
+.hero-scene-active .hero-text h1 {
+    animation: textFadeInRight 0.8s ease forwards;
+    animation-delay: 0s;
+}
+
+.hero-scene-active .hero-text h2 {
+    animation: textFadeInRight 0.8s ease forwards;
+    animation-delay: 0.3s;
+}
+
+.hero-scene-active .hero-text h3 {
+    animation: textFadeInRight 0.8s ease forwards;
+    animation-delay: 0.6s;
+}
+
+/* Phase 2: Shift Left */
+.hero-scene-active .hero-fixed-card {
+    animation: cardShiftLeft 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    animation-delay: 1.5s;
+}
+
+/* Phase 3: Button Center Reveal */
+.hero-scene-active .hero-cta {
+    animation: btnFadeUp 0.8s ease forwards;
+    animation-fill-mode: forwards;
+    animation-delay: 2.6s;
+}
+
+@keyframes textFadeInRight {
+    0% {
+        opacity: 0;
+        transform: translateX(40px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes cardShiftLeft {
+    0% {
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    100% {
+        left: 10%;
+        transform: translate(0, -50%);
+    }
+}
+
+@keyframes btnFadeUp {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 
+========================================
+   Responsive Overrides & Safety
+========================================
+*/
+@media (max-width: 768px) {
+    .hero-scene-active .hero-fixed-card {
+        animation: none !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+    }
+
+    .hero-scene-active .hero-cta {
+        animation-delay: 1.5s;
+        /* Mobile Override */
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .hero-text h1,
+    .hero-text h2,
+    .hero-text h3,
+    .hero-cta,
+    .hero-fixed-card {
+        transform: none !important;
+    }
+
+    .hero-scene-active .hero-fixed-card {
+        animation: none !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+    }
+
+    @keyframes textFadeInRight {
+        0% {
+            opacity: 0;
+        }
+
+        100% {
+            opacity: 1;
+        }
+    }
+
+    @keyframes btnFadeUp {
+        0% {
+            opacity: 0;
+        }
+
+        100% {
+            opacity: 1;
+        }
+    }
+}
+
+/* 
+========================================
+   Hologram Overlay & Iron Card
+========================================
+*/
+.home-hologram-overlay {
+    position: absolute;
+    inset: 0;
+    top: 0;
+    z-index: 50;
+    pointer-events: none;
+    display: flex;
+    padding: 2rem;
+}
+
+.iron-video-card {
+    pointer-events: auto;
+    opacity: 0;
+    aspect-ratio: 3/4;
+    /* 1. Destroying the Physical Box */
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    backdrop-filter: none;
+    overflow: hidden;
+}
+
+
+
+.iron-video-card video {
+    /* 2. Layout Lock */
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+
+    /* 3. The Transparency knocked-out background (Screen mode deletes black) */
+    mix-blend-mode: screen;
+
+    /* 4. The Contour Glow Enhancement */
+
+}
+
+/* Base Desktop Drop Zone */
+@media (min-width: 768px) {
+    .home-hologram-overlay {
+        justify-content: flex-end;
+        align-items: flex-start;
+    }
+
+    .iron-video-card {
+        width: 300px;
+    }
+}
+
+/* Mobile Drop Zone */
+@media (max-width: 767px) {
+    .home-hologram-overlay {
+        justify-content: center;
+        align-items: flex-end;
+    }
+
+    .iron-video-card {
+        width: 200px;
+        max-width: 80%;
+    }
+}
+
+/* GPU-Accelerated Drop Choreography */
+.hero-scene-active .iron-video-card {
+    animation: ironDropIn 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    animation-delay: 3.5s;
+}
+
+@keyframes ironDropIn {
+    0% {
+        transform: translateY(-100vh);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* 
+========================================
+   About Section
+========================================
+*/
+.about-bento-grid {
+    --theme-gold: var(--accent-muted-gold);
+
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    grid-auto-rows: 250px;
+    width: 100%;
+
+    padding: 0rem 5rem;
+    will-change: transform;
+    transform: translateZ(0);
+
+    animation: nautical-sway 5s ease-in-out infinite alternate;
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+.bento-profile {
+    width: 325px;
+    height: 325px;
+    max-width: 325px;
+    max-height: 325px;
+    justify-self: center;
+    align-self: center;
+
+    /* Anti-Warping Proportions */
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+    overflow: hidden;
+
+    /* Dynamic Gold Border & Glowing Effect */
+    border: 2px solid var(--theme-gold);
+    box-shadow: 0 0 12px rgba(197, 159, 89, 0.568), inset 0 0 12px rgba(197, 160, 89, 0.2);
+}
+
+.bento-profile img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+}
+
+/* 
+========================================
+   Bento Box Sub-Cards (Unified Aesthetics)
+========================================
+*/
+.bento-bio,
+.card-tech-stack,
+.status-card,
+.card-certificate {
+    background: var(--bg-panel);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(212, 175, 55, 0.342);
+    /* Thin Gold Border */
+    will-change: transform, backdrop-filter, box-shadow, border-color;
+    transform: translateZ(0);
+
+    border-radius: 16px;
+    padding: 1.5rem;
+    text-align: left;
+
+    /* Strict cubic-bezier hardware acceleration lock */
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+        box-shadow 0.4s ease-in-out,
+        border-color 0.4s ease;
+
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.bento-bio:hover,
+.card-tech-stack:hover,
+.status-card:hover,
+.card-certificate:hover {
+    transform: translateY(-6px) translateZ(0);
+    /* The Repulsor Lift */
+    border-color: rgba(0, 229, 255, 0.5);
+    /* Brighten border with arc-cyan */
+    box-shadow: var(--glow-arc);
+}
+
+.bento-bio {
+    grid-column: span 2;
+    grid-row: span 2;
+    width: 625px;
+    margin-left: 4rem;
+}
+
+.card-tech-stack {
+    grid-column: 1 / 3;
+    /* Spans across two columns */
+    grid-row: 3;
+    /* Explicitly lock to row 3 */
+    display: flex;
+    flex-direction: column;
+}
+
+.card-certificate {
+    grid-column: 3 / 4;
+    /* Sits in 3rd column exactly beside Tech Stack */
+    grid-row: 3;
+    /* Matches Tech Stack row */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: 0.75rem;
+}
+
+.status-card {
+    height: 200px;
+    width: 300px;
+    justify-self: center;
+    align-self: center;
+    margin-top: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    /* Stack elements vertically */
+    align-items: center;
+    justify-content: center;
+    /* Matching profile width */
+    gap: 0.5rem;
+    /* Space them out evenly */
+    text-align: center;
+}
+
+/* 
+========================================
+   Status Card: Text Elements
+========================================
+*/
+.status-card h3 {
+    font-size: 1.5rem;
+    color: var(--accent-muted-gold);
+    margin: 0;
+    text-transform: none;
+    /* Override bento-bio h3 styling */
+    letter-spacing: normal;
+}
+
+.status-card h4 {
+    font-size: 1.1rem;
+    color: var(--text-sea-mist);
+    font-weight: 400;
+    margin: 0;
+}
+
+.status-card .social-link {
+    margin-top: 0.5rem;
+}
+
+.status-card .social-link svg {
+    width: 24px;
+    height: 24px;
+    fill: var(--text-pearl);
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.status-card .social-link:hover svg {
+    transform: translateY(-4px);
+    fill: var(--accent-muted-gold);
+    filter: drop-shadow(0 0 8px rgba(197, 160, 89, 0.6));
+}
+
+.bento-bio h3,
+.card-tech-stack h3,
+.card-certificate h3 {
+    font-family: var(--font-heading);
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--accent-muted-gold);
+    margin-bottom: 1rem;
+}
+
+.card-certificate h3 {
+    margin-bottom: 0.25rem;
+}
+
+.cert-icon {
+    width: 32px;
+    height: 32px;
+    fill: var(--accent-muted-gold);
+}
+
+.cert-link {
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    color: var(--text-pearl);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    transition: color 0.3s ease;
+}
+
+.cert-link:hover {
+    color: var(--cursed-coral, #D95B66);
+}
+
+.card-about-content {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    height: 100%;
+    /* Hide the scrollbar entirely */
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+.card-about-content::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari and Opera */
+}
+
+.card-about-content p,
+#about-bio {
+    font-family: var(--font-body);
+    font-size: clamp(1.2rem, calc(1.5vw + 1.2rem), 1.2rem);
+    line-height: 1.6;
+    color: var(--text-pearl);
+    margin: 0;
+    margin-bottom: 0.75rem;
+}
+
+.card-about-content strong {
+    font-weight: 700;
+    color: var(--accent-muted-gold);
+    letter-spacing: 0.02em;
+}
+
+.card-about-content p:last-child {
+    margin-bottom: 0;
+}
+
+/* 
+========================================
+   Tech Stack Panorama (Scroll Area)
+========================================
+*/
+.tech-stack-scroll-area {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1.5rem;
+    overflow-x: auto;
+    white-space: nowrap;
+    width: 100%;
+    /* Hide the scrollbar entirely */
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+.tech-stack-scroll-area::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari and Opera */
+}
+
+.skill-list h4 {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-sea-mist);
+    opacity: 0.9;
+    margin-bottom: 0.8rem;
+}
+
+.skill-list ul {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.2rem;
+}
+
+.skill-list li {
+    background: var(--bg-obsidian);
+    color: var(--text-pearl);
+    border: 1px solid var(--accent-muted-gold);
+    border-radius: 50px;
+    padding: 0.5rem 1.2rem;
+    font-size: 0.95rem;
+    font-family: var(--font-body);
+    font-weight: 400;
+    letter-spacing: 1px;
+    will-change: transform, box-shadow;
+    transform: translateZ(0);
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.skill-list li:hover {
+    transform: translateY(-3px) scale(1.05) translateZ(0);
+    box-shadow: 0 4px 15px rgba(197, 160, 89, 0.15);
+    border-color: rgba(197, 160, 89, 1);
+    color: var(--accent-muted-gold);
+}
+
+/* 
+========================================
+   Projects Section (Bento Grid Architecture)
+========================================
+*/
+#projects {
+    align-items: flex-start;
+    width: 100%;
+}
+
+.projects-bento-grid {
+    display: grid;
+    /* Strict 2-Column layout for desktop, single column for mobile handled by media query */
+    grid-template-columns: repeat(2, 1fr);
+    justify-content: center;
+    gap: 3rem;
+    /* Increased gap for better cinematic spacing */
+    width: 100%;
+}
+
+/* 
+========================================
+   Project Reveal Animations
+========================================
+*/
+.project-reveal {
+    opacity: 0;
+    transform: translateY(50px) scale(0.95);
+    transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    will-change: transform, opacity;
+}
+
+.project-reveal.revealed {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+/* Staggered Delay for the Grid (applied via JS) */
+.project-reveal:nth-child(odd) {
+    transition-delay: 0.1s;
+}
+
+.project-reveal:nth-child(even) {
+    transition-delay: 0.3s;
+}
+
+/* 
+========================================
+   Bento Card Geometry & Glassmorphism
+========================================
+*/
+.project-bento-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    border-radius: 20px;
+
+    /* Decayed wood / Deep sea fallback */
+    background: rgba(26, 36, 30, 0.95);
+    background: rgba(26, 36, 30, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    border: 1px solid var(--weathered-bone, #E2D9C8);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.9);
+
+    /* Antigravity Physics Anchor */
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.project-bento-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.9), 0 0 15px rgba(217, 91, 102, 0.2);
+    border-color: var(--cursed-coral, #D95B66);
+}
+
+/* 
+========================================
+   Bento Image Click Target & FX
+========================================
+*/
+.project-image-link {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.project-image-link img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    transition: transform 0.4s ease;
+}
+
+.project-bento-card:hover .project-image-link img {
+    /* Premium image reveal scaling on hover */
+    transform: scale(1.05);
+}
+
+/* 
+========================================
+   Project Info Layers
+========================================
+*/
+.project-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.project-info h3 {
+    font-family: var(--font-heading, "Cinzel Decorative", serif);
+    font-size: 1.5rem;
+    color: var(--weathered-bone, #E2D9C8);
+    margin: 0;
+    letter-spacing: 1px;
+}
+
+.project-lang {
+    font-family: var(--font-body, "Cormorant Garamond", serif);
+    font-size: 1rem;
+    color: var(--cursed-coral, #D95B66);
+    margin: 0;
+    font-style: italic;
+}
+
+/* 
+========================================
+   GitHub Bottom HUD
+========================================
+*/
+.project-github {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    /* Pushes HUD firmly to the bottom regardless of card height */
+    margin-top: auto;
+}
+
+.project-github a {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    color: var(--weathered-bone, #E2D9C8);
+    font-family: var(--font-body, "Cormorant Garamond", serif);
+    font-size: 1rem;
+    transition: color 0.3s ease;
+}
+
+.project-github a:hover {
+    color: var(--cursed-coral, #D95B66);
+}
+
+.project-github svg {
+    /* Sized as per A11y constraints */
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+}
+
+/* 
+========================================
+   Contact Form Design
+========================================
+*/
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    width: 100%;
+    max-width: 600px;
+    background: rgba(15, 20, 30, 0.9);
+    /* Graceful Fallback */
+    background: rgba(15, 20, 30, 0.4);
+    /* Obsidian Glass */
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(197, 160, 89, 0.15);
+    /* Thin Gold Border */
+    will-change: transform, backdrop-filter;
+    transform: translateZ(0);
+    padding: 3rem;
+    border-radius: 24px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8);
+    text-align: left;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+form label {
+    font-weight: 700;
+    font-size: 0.85rem;
+    font-family: var(--font-body);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0;
+    display: block;
+    color: var(--accent-muted-gold);
+}
+
+form input,
+form textarea {
+    width: 100%;
+    padding: 0.4rem 0;
+    border: none;
+    border-bottom: 1px solid rgba(197, 160, 89, 0.3);
+    border-radius: 0;
+    background: transparent;
+    color: var(--text-pearl);
+    font-family: inherit;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+form textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Tactile Focus State */
+form input:focus,
+form textarea:focus {
+    border-bottom-color: rgba(197, 160, 89, 1);
+    border-bottom-width: 2px;
+}
+
+/* Chrome Auto-Fill Bug Fix */
+input:-webkit-autofill,
+textarea:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 30px transparent inset !important;
+    -webkit-text-fill-color: var(--text-pearl) !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+.submit-btn {
+    margin-top: 1rem;
+    padding: 1.2rem;
+    background: transparent;
+    color: var(--accent-muted-gold);
+    border: 1px solid rgba(197, 160, 89, 0.3);
+    border-radius: 5px;
+    font-weight: 700;
+    font-size: 1rem;
+    font-family: var(--font-body);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.8);
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.submit-btn:hover,
+.submit-btn:focus-visible {
+    transform: translateY(-3px);
+    border-color: rgba(197, 160, 89, 1);
+    color: var(--accent-muted-gold);
+    box-shadow: 0 4px 15px rgba(197, 160, 89, 0.15);
+}
+
+/* 
+========================================
+   Global Site Footer
+========================================
+*/
+#site-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    width: 100vw;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    background: rgba(15, 20, 30, 0.9);
+    /* Fallback */
+    background: rgba(8, 11, 18, 0.85);
+    /* Deep midnight */
+    border-top: 1px solid rgba(197, 160, 89, 0.15);
+    /* Thin gold border */
+    padding: 2rem 5%;
+    margin-top: 0rem;
+}
+
+.footer-copyright {
+    color: var(--text-sea-mist);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+    margin: 0;
+}
+
+.footer-hud {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1rem;
+}
+
+.footer-socials {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+}
+
+.social-link {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Antigravity Floating Transition */
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.social-link svg {
+    /* Ensure mathematical identical dimensions */
+    width: 24px;
+    height: 24px;
+    fill: var(--weathered-bone, #E2D9C8);
+    transition: fill 0.3s ease;
+}
+
+/* Antigravity Interactiveness on Hover/Focus */
+.social-link:hover,
+.social-link:focus-visible {
+    transform: translateY(-4px);
+    outline: none;
+}
+
+/* Transition to thematic cursed coral logic on hover/focus */
+.social-link:hover svg,
+.social-link:focus-visible svg {
+    fill: var(--cursed-coral, #D95B66);
+    filter: drop-shadow(0 0 8px rgba(217, 91, 102, 0.6));
+}
+
+#back-to-top {
+    background: transparent;
+    color: var(--accent-muted-gold);
+    border: 1px solid rgba(197, 160, 89, 0.3);
+    border-radius: 5px;
+    padding: 0.6rem 1.5rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    font-family: var(--font-body);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.8);
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+#back-to-top:hover,
+#back-to-top:focus-visible {
+    transform: translateY(-4px);
+    outline: none;
+    border-color: rgba(197, 160, 89, 1);
+    color: var(--accent-muted-gold);
+    box-shadow: 0 4px 15px rgba(197, 160, 89, 0.15);
+}
+
+/* 
+========================================
+   Mobile Responsiveness
+========================================
+*/
+@media (max-width: 768px) {
+    nav {
+        padding: 0.6rem 1.5rem;
+        top: 1.5rem;
+        width: 90%;
+        max-width: 400px;
+    }
+
+    nav ul {
+        gap: 1.5rem;
+        justify-content: space-evenly;
+    }
+
+    nav a {
+        font-size: 0.95rem;
+    }
+
+    .about-bento-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        grid-auto-rows: auto;
+        padding: 0rem 1rem;
+    }
+
+    .bento-bio,
+    .card-tech-stack,
+    .card-certificate {
+        grid-column: 1 / -1;
+        grid-row: auto;
+        width: 100%;
+        height: auto;
+    }
+
+    .status-card {
+        width: 100%;
+        height: auto;
+    }
+
+    .project-card {
+        width: 85vw;
+    }
+
+    .projects-bento-grid {
+        grid-template-columns: 1fr;
+        /* Switch to single column on mobile */
+        gap: 2rem;
+    }
+
+    /* Footer Mobile Stack */
+    #site-footer {
+        flex-direction: column-reverse;
+        align-items: center;
+        gap: 2rem;
+        text-align: center;
+    }
+
+    .footer-hud {
+        align-items: center;
+    }
+}
+
+/* 
+========================================
+   Global Audio Control HUD
+========================================
+*/
+.audio-control-btn {
+    position: fixed;
+    top: 1.5rem;
+    right: 2rem;
+    z-index: 10001;
+    /* Above header (10000) */
+    background: var(--gunmetal-panel);
+    border: 1px solid var(--smelted-grey);
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    color: var(--ember-red);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+}
+
+.audio-control-btn:hover {
+    border-color: var(--molten-edge);
+    box-shadow: 0 0 20px var(--ember-red), 0 0 40px var(--ember-red);
+    color: var(--molten-edge);
+    transform: scale(1.1);
+}
+
+.audio-control-btn {
+    animation: audio-pulse 2s infinite ease-in-out;
+}
+
+@keyframes audio-pulse {
+    0% {
+        box-shadow: 0 0 10px rgba(192, 57, 43, 0.4);
+    }
+
+    50% {
+        box-shadow: 0 0 25px rgba(192, 57, 43, 0.8), 0 0 40px rgba(192, 57, 43, 0.4);
+    }
+
+    100% {
+        box-shadow: 0 0 10px rgba(192, 57, 43, 0.4);
+    }
+}
+
+.audio-control-btn svg {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+}

@@ -1,0 +1,34 @@
+# Python / Virtual Environment
+venv/
+env/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+*.sqlite3
+
+# Large archive files & Installers
+*.zip
+*.rar
+*.tar.gz
+*.7z
+*.exe
+*.msi
+*.dmg
+*.iso
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node dependencies (if applicable)
+node_modules/
+
+# OS specific files
+Thumbs.db
+Desktop.ini
+.DS_Store
