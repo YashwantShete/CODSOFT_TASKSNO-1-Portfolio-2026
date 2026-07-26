@@ -45,6 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (sessionStorage.getItem('starkPreloaderPlayed') === 'true') {
         // [RETURNING USER] - INSTANT BYPASS
         if (preloader) preloader.remove();
+        document.body.classList.remove('hide-content', 'no-scroll');
         document.body.classList.add('site-fade-in');
         
         // Trigger timeline instantly for returning users
@@ -61,7 +62,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const handleBypass = (e) => {
             if (e.key === 'Enter' || e.key === 'Escape') {
                 if (fallbackTimeout) clearTimeout(fallbackTimeout);
-                if (preloaderVideo) preloaderVideo.removeEventListener('ended', dismissPreloader);
+                if (preloaderVideo) {
+                    preloaderVideo.removeEventListener('ended', dismissPreloader);
+                    preloaderVideo.removeEventListener('error', dismissPreloader);
+                }
                 document.removeEventListener('keydown', handleBypass);
                 dismissPreloader();
             }
@@ -77,15 +81,25 @@ document.addEventListener("DOMContentLoaded", () => {
                 dismissPreloader();
             });
 
-            // Fallback: If the video fails to load/play, dismiss after 8 seconds anyway
-            fallbackTimeout = setTimeout(() => {
-                preloaderVideo.removeEventListener('ended', dismissPreloader);
+            // Dismiss immediately if video fails to play/load
+            preloaderVideo.addEventListener('error', () => {
+                if (fallbackTimeout) clearTimeout(fallbackTimeout);
                 document.removeEventListener('keydown', handleBypass);
                 dismissPreloader();
-            }, 8000);
+            });
+
+            // Fallback: If the video fails to load/play, dismiss after 3 seconds anyway
+            fallbackTimeout = setTimeout(() => {
+                if (preloaderVideo) {
+                    preloaderVideo.removeEventListener('ended', dismissPreloader);
+                    preloaderVideo.removeEventListener('error', dismissPreloader);
+                }
+                document.removeEventListener('keydown', handleBypass);
+                dismissPreloader();
+            }, 3000);
         } else {
             // Ultimate fallback if the video element is missing
-            fallbackTimeout = setTimeout(dismissPreloader, 4000);
+            fallbackTimeout = setTimeout(dismissPreloader, 1000);
         }
     }
 
